@@ -14,7 +14,9 @@
 <header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a asp-controller="Home" asp-action="Index" class="navbar-brand">Villa <i class="bi bi-house-fill" style="color: #fcc200"></i> </a>
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand">
+                <img src="Images/resort.png" style="width: 35px"/>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor04" aria-controls="navbarColor04" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -26,11 +28,11 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-light" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item">Action</a>
+                            <a class="dropdown-item">Another action</a>
+                            <a class="dropdown-item">Something else here</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Separated link</a>
+                            <a class="dropdown-item">Separated link</a>
                         </div>
                     </li>
                 </ul>
@@ -46,6 +48,7 @@
 </header>
 <div class="container">
     <main role="main" class="pb-3">
+        <partial name="_Notification"/>
         @RenderBody()
     </main>
 </div>
