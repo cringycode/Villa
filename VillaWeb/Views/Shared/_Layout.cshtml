@@ -15,7 +15,7 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a asp-controller="Home" asp-action="Index" class="navbar-brand">
-                <img src="Images/resort.png" style="width: 35px"/>
+                <img src="Images/resort.png" style=" width: 40px"/>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor04" aria-controls="navbarColor04" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -25,15 +25,8 @@
                     <li class="nav-item">
                         <a asp-controller="Villa" asp-action="Index" class="nav-link">Villa</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item">Action</a>
-                            <a class="dropdown-item">Another action</a>
-                            <a class="dropdown-item">Something else here</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item">Separated link</a>
-                        </div>
+                    <li class="nav-item">
+                        <a asp-controller="VillaNumber" asp-action="Index" class="nav-link">Villa Number</a>
                     </li>
                 </ul>
                 <form class="d-flex">
