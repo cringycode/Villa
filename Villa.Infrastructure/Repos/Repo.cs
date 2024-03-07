@@ -3,78 +3,71 @@ using Microsoft.EntityFrameworkCore;
 using Villa.Application.Common.Interfaces;
 using Villa.Infrastructure.Data;
 
-namespace Villa.Infrastructure.Repo;
+namespace Villa.Infrastructure.Repos;
 
-public class VillaRepo : IVillaRepo
+public class Repo<T> : IRepo<T> where T : class
 {
     private readonly AppDbContext _db;
+    internal DbSet<T> dbSet;
 
-    public VillaRepo(AppDbContext db)
+    public Repo(AppDbContext db)
     {
         _db = db;
+        dbSet = _db.Set<T>();
     }
 
-    public IEnumerable<Domain.Entities.Villa> GetAll(Expression<Func<Domain.Entities.Villa, bool>>? filter = null,
-        string? includeProperties = null)
+    public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
     {
-        IQueryable<Domain.Entities.Villa> query = _db.Set<Domain.Entities.Villa>();
+        IQueryable<T> query = dbSet;
         if (filter is not null)
         {
             query = query.Where(filter);
         }
-        
+
         if (!string.IsNullOrEmpty(includeProperties))
         {
-            // Villa, VillaNumber
             foreach (var includeProp in includeProperties.Split
                          (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProp);
             }
         }
-        
+
         return query.ToList();
     }
 
-    public Domain.Entities.Villa Get(Expression<Func<Domain.Entities.Villa, bool>> filter,
-        string? includeProperties = null)
+    public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
     {
-        IQueryable<Domain.Entities.Villa> query = _db.Set<Domain.Entities.Villa>();
+        IQueryable<T> query = dbSet;
         if (filter is not null)
         {
             query = query.Where(filter);
         }
-        
+
         if (!string.IsNullOrEmpty(includeProperties))
         {
-            // Villa, VillaNumber
             foreach (var includeProp in includeProperties.Split
                          (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProp);
             }
         }
-        
+
         return query.FirstOrDefault();
     }
 
-    public void Add(Domain.Entities.Villa entity)
+    public void Add(T entity)
     {
-        _db.Add(entity);
+        dbSet.Add(entity);
     }
 
-    public void Update(Domain.Entities.Villa entity)
+    public bool Any(Expression<Func<T, bool>> filter)
     {
-        _db.Villas.Update(entity);
+        return dbSet.Any(filter);
     }
 
-    public void Remove(Domain.Entities.Villa entity)
+    public void Remove(T entity)
     {
-        _db.Remove(entity);
-    }
-
-    public void Save()
-    {
-        _db.SaveChanges();
+        dbSet.Remove(entity);
     }
 }
