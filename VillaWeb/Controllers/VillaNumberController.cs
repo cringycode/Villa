@@ -52,12 +52,14 @@ public class VillaNumberController : Controller
         if (roomNumberExists)
         {
             TempData["error"] = "The Villa Number Already Exists.";
-            obj.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
-            {
-                Text = u.Name,
-                Value = u.Id.ToString()
-            });
         }
+
+        obj.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
+        {
+            Text = u.Name,
+            Value = u.Id.ToString()
+        });
+
 
         return View(obj);
     }
