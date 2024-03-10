@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Villa.Application.Common.Interfaces;
+using Villa.Application.Common.Utility;
 using Villa.Domain.Entities;
 using VillaWeb.ViewModels;
 
 namespace VillaWeb.Controllers;
 
+[Authorize(Roles = SD.RoleAdmin)]
 public class VillaNumberController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;

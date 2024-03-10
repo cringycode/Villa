@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Villa.Application.Common.Interfaces;
+using Villa.Application.Common.Utility;
 using Villa.Domain.Entities;
 using VillaWeb.ViewModels;
 
 namespace VillaWeb.Controllers;
 
+[Authorize(Roles = SD.RoleAdmin)]
 public class AmenityController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -46,7 +49,7 @@ public class AmenityController : Controller
             TempData["success"] = "The Amenity has been created successfully.";
             return RedirectToAction(nameof(Index));
         }
-        
+
         obj.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
         {
             Text = u.Name,
