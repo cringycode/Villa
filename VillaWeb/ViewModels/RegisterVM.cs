@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace VillaWeb.ViewModels;
 
-public class RegisterVM
+public class RegisterVM 
 {
     [Required]
     public string Email { get; set; }
@@ -26,4 +28,9 @@ public class RegisterVM
 
 
     public string? RedirectUrl { get; set; }
+
+    public string Role { get; set; }
+
+    [ValidateNever]
+    public IEnumerable<SelectListItem>? RoleList { get; set; }
 }
