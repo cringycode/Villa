@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Villa.Domain.Entities;
 
 namespace Villa.Infrastructure.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -12,11 +13,12 @@ public class AppDbContext : DbContext
     public DbSet<Domain.Entities.Villa> Villas { get; set; }
     public DbSet<VillaNumber> VillaNumbers { get; set; }
     public DbSet<Amenity> Amenities { get; set; }
+    public DbSet<AppUser> AppUsers { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //  base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder);   //required for Identity migration.
 
         modelBuilder.Entity<Domain.Entities.Villa>().HasData(
             new Domain.Entities.Villa
