@@ -14,11 +14,12 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<VillaNumber> VillaNumbers { get; set; }
     public DbSet<Amenity> Amenities { get; set; }
     public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);   //required for Identity migration.
+        base.OnModelCreating(modelBuilder); //required for Identity migration.
 
         modelBuilder.Entity<Domain.Entities.Villa>().HasData(
             new Domain.Entities.Villa
