@@ -10,7 +10,7 @@ public class UnitOfWork : IUnitOfWork
     public IVillaNumberRepo VillaNumber { get; private set; }
     public IAmenityRepo Amenity { get; private set; }
     public IBookingRepo Booking { get; private set; }
-    public IAppUserRepo AppUser { get; }
+    public IAppUserRepo AppUser { get; private set; }
 
     public UnitOfWork(AppDbContext db, IAppUserRepo appUser)
     {

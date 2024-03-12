@@ -18,6 +18,7 @@ builder.Services.Configure<IdentityOptions>(option =>
     option.Password.RequireNonAlphanumeric = false;
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAppUserRepo, AppUserRepo>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
