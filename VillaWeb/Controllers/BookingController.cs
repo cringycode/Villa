@@ -10,11 +10,21 @@ namespace VillaWeb.Controllers;
 
 public class BookingController : Controller
 {
+    #region DI
+
     private readonly IUnitOfWork _unitOfWork;
 
     public BookingController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
+    }
+
+    #endregion
+
+    [Authorize]
+    public IActionResult Index()
+    {
+        return View();
     }
 
     [Authorize]
@@ -41,6 +51,8 @@ public class BookingController : Controller
 
         return View(booking);
     }
+
+    #region PAYMENT
 
     [Authorize]
     [HttpPost]
@@ -110,4 +122,30 @@ public class BookingController : Controller
 
         return View(bookingId);
     }
+
+    #endregion
+
+    #region API CALLS
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult GetAll()
+    {
+        IEnumerable<Booking> objBookings;
+        if (User.IsInRole(SD.RoleAdmin))
+        {
+            objBookings = _unitOfWork.Booking.GetAll(includeProperties: "User,Villa");
+        }
+        else
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            objBookings = _unitOfWork.Booking.GetAll(u => u.UserId == userId, includeProperties: "User,Villa");
+        }
+
+        return Json(new { data = objBookings });
+    }
+
+    #endregion
 }
