@@ -52,6 +52,16 @@ public class BookingController : Controller
         return View(booking);
     }
 
+    [Authorize]
+    public IActionResult BookingDetails(int bookingId)
+    {
+        Booking bookingFromDb = _unitOfWork.Booking.Get(u => u.Id == bookingId,
+            includeProperties: "User,Villa");
+
+        return View(bookingFromDb);
+    }
+
+
     #region PAYMENT
 
     [Authorize]
@@ -129,7 +139,7 @@ public class BookingController : Controller
 
     [HttpGet]
     [Authorize]
-    public IActionResult GetAll()
+    public IActionResult GetAll(string status)
     {
         IEnumerable<Booking> objBookings;
         if (User.IsInRole(SD.RoleAdmin))
@@ -142,6 +152,11 @@ public class BookingController : Controller
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             objBookings = _unitOfWork.Booking.GetAll(u => u.UserId == userId, includeProperties: "User,Villa");
+        }
+
+        if (!string.IsNullOrEmpty(status))
+        {
+            objBookings = objBookings.Where(u => u.Status.ToLower().Equals(status.ToLower()));
         }
 
         return Json(new { data = objBookings });
