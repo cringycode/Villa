@@ -4,7 +4,7 @@
         <div class="col-12 col-lg-6 p-4 2 mt-2 mt-md-0">
             <div class="row p-1 " style="border-radius:20px; ">
                 <div class="col-6">
-                    <h3 class="text-success">Villa Details</h3>
+                    <h3 class="text-light">Villa Details</h3>
                 </div>
                 <div class="col-6 text-end">
                     <a class="btn btn-secondary my-2"
@@ -16,9 +16,9 @@
                 <partial name="_VillaDetail" model="@Model.Villa"/>
                 <hr/>
                 <div class="text-end">
-                    <h4 class="text-danger font-weight-bold ">
+                    <h4 class="text-success font-weight-bold ">
                         Booking Total :
-                        <span style="border-bottom:1px solid #ff6a00">
+                        <span>
                             @Model.TotalCost.ToString("c")
                         </span>
                     </h4>
@@ -27,16 +27,23 @@
         </div>
         <div class="col-12 col-lg-6 p-4 2 mt-4 mt-md-0" style="border-left:1px solid #aaa">
             <form method="post">
-
+                <input asp-for="Id" hidden/>
+                <input asp-for="VillaId" hidden/>
+                <input asp-for="UserId" hidden/>
+                <input asp-for="CheckInDate" hidden/>
+                <input asp-for="CheckOutDate" hidden/>
+                <input asp-for="Nights" hidden/>
                 <div class="row pt-1 mb-3 " style="border-radius:20px; ">
                     <div class="col-6">
-                        <h3 class="text-success">Enter Booking Details</h3>
+                        <h3 class="text-light">Enter Booking Details</h3>
                     </div>
                     <div class="col-6">
                         @if ((Model.Status == SD.StatusApproved || Model.Status == SD.StatusPending)
                              && User.IsInRole(SD.RoleAdmin))
                         {
-                            <button type="submit" class="btn btn-sm btn-outline-danger form-control my-1"><i class="bi bi-x-circle"></i> &nbsp; Cancel Booking</button>
+                            <button asp-action="CancelBooking" type="submit" class="btn btn-sm btn-outline-danger form-control my-1">
+                                <i class="bi bi-x-lg"></i> &nbsp; Cancel Booking
+                            </button>
                         }
                     </div>
                 </div>
@@ -81,6 +88,29 @@
                         <label class="text-warning">Actual Check-out Date</label>
                         <input asp-for="ActualCheckOutDate" disabled class="form-control"/>
                     </div>
+                    @if (Model.Status == SD.StatusApproved && User.IsInRole(SD.RoleAdmin))
+                    {
+                        <div class="form-group pt-2 col-6">
+                            <label class="text-primary" asp-for="VillaNumber"> Villa Number</label>
+                            <select class="form-select" asp-for="VillaNumber">
+                                @foreach (var item in Model.VillaNumbers)
+                                {
+                                    <option value="@item.Villa_Number">@item.Villa_Number</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    else
+                    {
+                        <input asp-for="VillaNumber" hidden/>
+                        @if (Model.Status == SD.StatusCompleted | Model.Status == SD.StatusCheckedIn)
+                        {
+                            <div class="form-group pt-2 col-6">
+                                <label class="text-warning">Villa Number</label>
+                                <input asp-for="VillaNumber" disabled class="form-control"/>
+                            </div>
+                        }
+                    }
                     @if (Model.IsPaymentSuccessful && User.IsInRole(SD.RoleAdmin))
                     {
                         <div class="form-group pt-2 col-6">
@@ -96,17 +126,28 @@
                             <input asp-for="PaymentDate" disabled class="form-control"/>
                         </div>
                     }
+                    <div class="form-group pt-2 col-6">
+                        <label class="text-warning">Status</label>
+                        <input asp-for="Status" disabled class="form-control"/>
+                    </div>
                 </div>
-                <div class="form-group pt-2 pt-md-4">
-                    @if (Model.Status == SD.StatusApproved)
-                    {
-                        <button type="submit" class="btn btn-warning form-control my-1"><i class="bi bi-check2-square"></i> &nbsp; Check In</button>
-                    }
-                    @if (Model.Status == SD.StatusCheckedIn)
-                    {
-                        <button type="submit" class="btn btn-success form-control my-1"><i class="bi bi-clipboard2-check"></i> &nbsp; Check Out / Complete Booking</button>
-                    }
-                </div>
+                @if (User.IsInRole(SD.RoleAdmin))
+                {
+                    <div class="form-group pt-2 pt-md-4">
+                        @if (Model.Status == SD.StatusApproved)
+                        {
+                            <button asp-action="CheckIn" type="submit" class="btn btn-success form-control my-1">
+                                <i class="bi bi-download"></i> &nbsp; Check In
+                            </button>
+                        }
+                        @if (Model.Status == SD.StatusCheckedIn)
+                        {
+                            <button asp-action="CheckOut" type="submit" class="btn btn-success form-control my-1">
+                                <i class="bi bi-upload"></i> &nbsp; Check Out / Complete Booking
+                            </button>
+                        }
+                    </div>
+                }
             </form>
         </div>
     </div>

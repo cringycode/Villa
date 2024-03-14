@@ -52,16 +52,6 @@ public class BookingController : Controller
         return View(booking);
     }
 
-    [Authorize]
-    public IActionResult BookingDetails(int bookingId)
-    {
-        Booking bookingFromDb = _unitOfWork.Booking.Get(u => u.Id == bookingId,
-            includeProperties: "User,Villa");
-
-        return View(bookingFromDb);
-    }
-
-
     #region PAYMENT
 
     [Authorize]
@@ -74,6 +64,24 @@ public class BookingController : Controller
         booking.Status = SD.StatusPending;
         booking.BookingDate = DateTime.Now;
 
+        var villaNumbersList = _unitOfWork.VillaNumber.GetAll().ToList();
+        var bookedVillas = _unitOfWork.Booking
+            .GetAll(u => u.Status == SD.StatusApproved || u.Status == SD.StatusCheckedIn).ToList();
+        
+        int roomAvailable = SD.VillaRoomsAvailable_Count
+            (villa.Id, villaNumbersList, booking.CheckInDate, booking.Nights, bookedVillas);
+
+        if (roomAvailable == 0)
+        {
+            TempData["error"] = "Room has been sold out!";
+            //no rooms available
+            return RedirectToAction(nameof(FinalizeBooking), new
+            {
+                villaId = booking.VillaId,
+                checkInDate = booking.CheckInDate,
+                nights = booking.Nights
+            });
+        }
         _unitOfWork.Booking.Add(booking);
         _unitOfWork.Save();
 
@@ -131,6 +139,84 @@ public class BookingController : Controller
         }
 
         return View(bookingId);
+    }
+
+    #endregion
+
+    #region MANAGING
+
+    [HttpPost]
+    [Authorize(Roles = SD.RoleAdmin)]
+    public IActionResult CheckIn(Booking booking)
+    {
+        _unitOfWork.Booking.UpdateStatus(booking.Id, SD.StatusCheckedIn, booking.VillaNumber);
+        _unitOfWork.Save();
+        TempData["Success"] = "Booking Updated Successfully.";
+        return RedirectToAction(nameof(BookingDetails), new { bookingId = booking.Id });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = SD.RoleAdmin)]
+    public IActionResult CheckOut(Booking booking)
+    {
+        _unitOfWork.Booking.UpdateStatus(booking.Id, SD.StatusCompleted, booking.VillaNumber);
+        _unitOfWork.Save();
+        TempData["Success"] = "Booking Completed Successfully.";
+        return RedirectToAction(nameof(BookingDetails), new { bookingId = booking.Id });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = SD.RoleAdmin)]
+    public IActionResult CancelBooking(Booking booking)
+    {
+        _unitOfWork.Booking.UpdateStatus(booking.Id, SD.StatusCancelled, 0);
+        _unitOfWork.Save();
+        TempData["Success"] = "Booking Cancelled Successfully.";
+        return RedirectToAction(nameof(BookingDetails), new { bookingId = booking.Id });
+    }
+
+    #endregion
+
+    #region AVAILABILITY
+
+    [Authorize]
+    public IActionResult BookingDetails(int bookingId)
+    {
+        Booking bookingFromDb = _unitOfWork.Booking.Get(u => u.Id == bookingId,
+            includeProperties: "User,Villa");
+
+        if (bookingFromDb.VillaNumber == 0 && bookingFromDb.Status == SD.StatusApproved)
+        {
+            var availableVillaNumber = AssignAvailableVillaNumberByVilla(bookingFromDb.VillaId);
+
+            bookingFromDb.VillaNumbers = _unitOfWork.VillaNumber.GetAll(u =>
+                u.VillaId == bookingFromDb.VillaId && availableVillaNumber
+                    .Any(x => x == u.Villa_Number)).ToList();
+        }
+
+        return View(bookingFromDb);
+    }
+
+    private List<int> AssignAvailableVillaNumberByVilla(int villaId)
+    {
+        List<int> availableVillaNumbers = new();
+
+        var villaNumbers = _unitOfWork.VillaNumber
+            .GetAll(u => u.VillaId == villaId);
+
+        var checkedInVilla = _unitOfWork.Booking
+            .GetAll(u => u.VillaId == villaId && u.Status == SD.StatusCheckedIn)
+            .Select(u => u.VillaNumber);
+
+        foreach (var villaNumber in villaNumbers)
+        {
+            if (!checkedInVilla.Contains(villaNumber.Villa_Number))
+            {
+                availableVillaNumbers.Add(villaNumber.Villa_Number);
+            }
+        }
+
+        return availableVillaNumbers;
     }
 
     #endregion
