@@ -19,7 +19,7 @@ public class BookingRepo : Repo<Booking>, IBookingRepo
         _db.Bookings.Update(entity);
     }
 
-    public void UpdateStatus(int bookingId, string bookingStatus)
+    public void UpdateStatus(int bookingId, string bookingStatus, int villaNumber = 0)
     {
         var bookingFromDb = _db.Bookings.FirstOrDefault(x => x.Id == bookingId);
         if (bookingFromDb is not null)
@@ -27,9 +27,9 @@ public class BookingRepo : Repo<Booking>, IBookingRepo
             bookingFromDb.Status = bookingStatus;
             if (bookingStatus == SD.StatusCheckedIn)
             {
+                bookingFromDb.VillaNumber = villaNumber;
                 bookingFromDb.ActualCheckInDate = DateTime.Now;
             }
-
             if (bookingStatus == SD.StatusCompleted)
             {
                 bookingFromDb.ActualCheckOutDate = DateTime.Now;
@@ -46,6 +46,7 @@ public class BookingRepo : Repo<Booking>, IBookingRepo
             {
                 bookingFromDb.StripeSessionId = sessionId;
             }
+
             if (!string.IsNullOrEmpty(paymentIntentId))
             {
                 bookingFromDb.StripePaymentIntentId = paymentIntentId;
