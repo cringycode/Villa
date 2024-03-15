@@ -21,10 +21,16 @@ public class DashboardController : Controller
 
     #endregion
 
+    #region INDEX
+
     public IActionResult Index()
     {
         return View();
     }
+
+    #endregion
+
+    #region TOTAL BOOKINGS
 
     public async Task<IActionResult> GetTotalBookingChartData()
     {
@@ -37,21 +43,75 @@ public class DashboardController : Controller
         var countByPreviousMonth = totalBookings.Count
             (u => u.BookingDate >= currentMonthStartDate && u.BookingDate <= currentMonthStartDate);
 
+        return Json(GetRadialChartDataModel
+            (totalBookings.Count(), countByCurrentMonth, countByPreviousMonth));
+    }
+
+    #endregion
+
+    #region TOTAL USERS
+
+    public async Task<IActionResult> GetRegisteredUserChartData()
+    {
+        var totalUsers = _unitOfWork.AppUser.GetAll();
+
+        var countByCurrentMonth = totalUsers.Count
+            (u => u.CreatedAt >= currentMonthStartDate && u.CreatedAt <= DateTime.Now);
+
+        var countByPreviousMonth = totalUsers.Count
+            (u => u.CreatedAt >= currentMonthStartDate && u.CreatedAt <= currentMonthStartDate);
+
+
+        return Json(GetRadialChartDataModel
+            (totalUsers.Count(), countByCurrentMonth, countByPreviousMonth));
+    }
+
+    #endregion
+
+    #region REVENUE
+
+    public async Task<IActionResult> GetRevenueChartData()
+    {
+        var totalBookings = _unitOfWork.Booking.GetAll(u => u.Status != SD.StatusPending
+                                                            || u.Status == SD.StatusCancelled);
+
+        var totalRevenue = Convert.ToInt32(totalBookings.Sum(u => u.TotalCost));
+
+        var countByCurrentMonth = totalBookings.Where(u => u.BookingDate >= currentMonthStartDate &&
+                                                           u.BookingDate <= DateTime.Now).Sum(u => u.TotalCost);
+
+        var countByPreviousMonth = totalBookings.Where(u => u.BookingDate >= previousMonthStartDate &&
+                                                            u.BookingDate <= currentMonthStartDate)
+            .Sum(u => u.TotalCost);
+
+        return Json(GetRadialChartDataModel(totalRevenue, countByCurrentMonth, countByPreviousMonth));
+    }
+    
+
+    #endregion
+    
+    #region RADIAL CHART
+
+    private static RadialBarChartVM GetRadialChartDataModel(int totalCount, double currentMonthCount,
+        double prevMonthCount)
+    {
         RadialBarChartVM radialBarChartVM = new();
 
         int increaseDecreaseRatio = 100;
 
-        if (countByPreviousMonth != 0)
+        if (prevMonthCount != 0)
         {
             increaseDecreaseRatio =
-                Convert.ToInt32((countByCurrentMonth - countByPreviousMonth) / countByPreviousMonth * 100);
+                Convert.ToInt32((currentMonthCount - prevMonthCount) / prevMonthCount * 100);
         }
 
-        radialBarChartVM.TotalCount = totalBookings.Count();
-        radialBarChartVM.CountInCurrentMonth = countByCurrentMonth;
-        radialBarChartVM.HasRatioIncreased = currentMonthStartDate > previousMonthStartDate;
+        radialBarChartVM.TotalCount = totalCount;
+        radialBarChartVM.CountInCurrentMonth = Convert.ToUInt32(currentMonthCount);
+        radialBarChartVM.HasRatioIncreased = currentMonthCount > prevMonthCount;
         radialBarChartVM.Series = new int[] { increaseDecreaseRatio };
 
-        return Json(radialBarChartVM);
+        return radialBarChartVM;
     }
+
+    #endregion 
 }
