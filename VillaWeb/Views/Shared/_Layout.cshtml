@@ -12,15 +12,13 @@
     <link rel="stylesheet" href="~/VillaWeb.styles.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/spinner.css"/>
     <link rel="stylesheet" href="//cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css"/>
-    <link rel="stylesheet" href="~/css/apexcharts.css"/>
-
 </head>
 <body>
 <header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a asp-controller="Home" asp-action="Index" class="navbar-brand">
-                <img src="Images/resort.png" style=" width: 40px"/>
+            Havenly <i style="color:#ffd700" class="bi bi-house-fill"></i>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor04" aria-controls="navbarColor04" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -75,6 +73,5 @@
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>@await RenderSectionAsync("Scripts", required: false)
-<script src="~/js/apexcharts.js"></script>
 </body>
 </html>

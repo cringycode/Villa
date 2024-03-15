@@ -2,14 +2,14 @@
 
 <div class="container pt-5">
     <div class="card shadow border">
-        <div class="card-header bg-success bg-gradient ml-0 py-4">
+        <div class="card-header bg-secondary bg-gradient ml-0 py-4 mb-3 rounded-3">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h2 class="py-2 text-white">Login</h2>
+                    <h2 class="py-2 text-black">Login</h2>
                 </div>
             </div>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-4 rounded-4">
             <div class="row">
                 <div class="col-md-12">
                     <section>
@@ -34,15 +34,14 @@
                                 </label>
                             </div>
                             <div>
-                                <button type="submit" class="w-100 btn btn-lg btn-outline-success">Log in</button>
+                                <button type="submit" class="w-100 btn btn-lg btn-outline-secondary">Log in</button>
                             </div>
-                            <div class="d-flex justify-content-between pt-2">
-                                <p>
-                                    <a asp-action="">Forgot your password?</a>
-                                </p>
-                                <p>
-                                    <a asp-all-route-returnUrl="@Model.RedirectUrl" asp-action="Register">Register as a new user</a>
-                                </p>
+                            <div class="d-flex justify-content-center pt-2">
+                                <small>
+                                    <button class="btn btn-group-vertical" asp-action="">Forgot your password?</button>
+                                    <button class="btn btn-group-vertical" asp-all-route-returnUrl="@Model.RedirectUrl" asp-action="Register">Register as a new user</button>
+
+                                </small>
                             </div>
                         </form>
                     </section>

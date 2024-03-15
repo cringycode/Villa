@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/VillaWeb.styles.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/spinner.css"/>
+    <link rel="stylesheet" href="~/css/apexcharts.css"/>
     <link rel="stylesheet" href="//cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css"/>
 </head>
 <body>
@@ -16,7 +17,7 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow">
         <div class="container-fluid d-flex justify-content-between">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="~/images/resort.png" style="width:35px"/>
+                Havenly <i style="color:#ffd700" class="bi bi-house-fill"></i>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -103,7 +104,6 @@
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>@await RenderSectionAsync("Scripts", required: false)
-@*  <script src="~/js/jquery.unobtrusive-ajax.min.js"></script> *@
-@*  <script src="~/js/jquery.unobtrusive-ajax.min.js"></script> *@
+<script src="~/js/apexcharts.js"></script>
 </body>
 </html>
