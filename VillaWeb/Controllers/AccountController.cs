@@ -10,7 +10,7 @@ namespace VillaWeb.Controllers;
 
 public class AccountController : Controller
 {
-    #region DE
+    #region DI
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AppUser> _userManager;
