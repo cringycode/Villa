@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Globalization;
+using System.Runtime.InteropServices.JavaScript;
+using Microsoft.AspNetCore.Mvc;
 using Villa.Application.Common.Interfaces;
 using Villa.Application.Common.Utility;
 using VillaWeb.ViewModels;
@@ -86,10 +88,108 @@ public class DashboardController : Controller
 
         return Json(GetRadialChartDataModel(totalRevenue, countByCurrentMonth, countByPreviousMonth));
     }
-    
 
     #endregion
-    
+
+    #region PIE CHART
+
+    public async Task<IActionResult> GetBookingPieChartData()
+    {
+        var totalBookings = _unitOfWork.Booking.GetAll
+        (u => u.BookingDate >= DateTime.Now.AddDays(-30) &&
+              (u.Status != SD.StatusPending || u.Status == SD.StatusCancelled));
+
+        var customerWithOneBooking = totalBookings.GroupBy(b => b.UserId)
+            .Where(x => x.Count() == 1)
+            .Select(x => x.Key).ToList();
+
+        int bookingsByNewCustomer = customerWithOneBooking.Count();
+        int bookingsByReturningCustomer = totalBookings.Count() - bookingsByNewCustomer;
+
+        PieChartVM pieChartVM = new()
+        {
+            Labels = new string[] { "New Customer Bookings", "Returning Customer Bookings" },
+            Series = new decimal[] { bookingsByNewCustomer, bookingsByReturningCustomer }
+        };
+        return Json(pieChartVM);
+    }
+
+    #endregion
+
+    #region LINE CHART
+
+    public async Task<IActionResult> GetMemberAndBookingLineChartData()
+    {
+        var bookingData = _unitOfWork.Booking
+            .GetAll(u => u.BookingDate >= DateTime.Now.AddDays(-30) && u.BookingDate.Date <= DateTime.Now)
+            .GroupBy(b => b.BookingDate.Date)
+            .Select(u => new
+            {
+                DateTime = u.Key,
+                NewBookingCount = u.Count()
+            });
+
+        var customerData = _unitOfWork.AppUser
+            .GetAll(u => u.CreatedAt >= DateTime.Now.AddDays(-30) && u.CreatedAt.Date <= DateTime.Now)
+            .GroupBy(b => b.CreatedAt.Date)
+            .Select(u => new
+            {
+                DateTime = u.Key,
+                NewCustomerCount = u.Count()
+            });
+
+        var leftJoin = bookingData
+            .GroupJoin(customerData, booking => booking.DateTime,
+                customer => customer.DateTime,
+                (booking, customer) => new
+                {
+                    booking.DateTime,
+                    booking.NewBookingCount,
+                    NewCustomerCount = customer.Select(x => x.NewCustomerCount).FirstOrDefault()
+                });
+
+
+        var rightJoin = customerData
+            .GroupJoin(bookingData, customer => customer.DateTime,
+                booking => booking.DateTime,
+                (customer, booking) => new
+                {
+                    customer.DateTime,
+                    NewBookingCount = booking.Select(x => x.NewBookingCount).FirstOrDefault(),
+                    customer.NewCustomerCount
+                });
+
+        var mergedData = leftJoin.Union(rightJoin).OrderBy(x => x.DateTime).ToList();
+
+        var newBookingData = mergedData.Select(x => x.NewBookingCount).ToArray();
+        var newCustomerData = mergedData.Select(x => x.NewCustomerCount).ToArray();
+        var categories = mergedData.Select(x => x.DateTime.ToString("MM/dd/yyyy")).ToArray();
+
+        List<ChartData> chartDataList = new()
+        {
+            new ChartData
+            {
+                Name = "New Bookings",
+                Data = newBookingData
+            },
+            new ChartData
+            {
+                Name = "New Members",
+                Data = newCustomerData
+            },
+        };
+
+        LineChartVM lineChartVM = new()
+        {
+            Categories = categories,
+            Series = chartDataList
+        };
+
+        return Json(lineChartVM);
+    }
+
+    #endregion
+
     #region RADIAL CHART
 
     private static RadialBarChartVM GetRadialChartDataModel(int totalCount, double currentMonthCount,
@@ -113,5 +213,5 @@ public class DashboardController : Controller
         return radialBarChartVM;
     }
 
-    #endregion 
+    #endregion
 }

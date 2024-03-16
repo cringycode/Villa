@@ -34,7 +34,7 @@
                 <input asp-for="CheckOutDate" hidden/>
                 <input asp-for="Nights" hidden/>
                 <div class="row pt-1 mb-3" style="border-radius:20px; ">
-                    <div class="col-12">
+                    <div class="col-12 text-center">
                         <h3 class="text-success">Enter Booking Details</h3>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                 <div class="form-group pt-2 pt-md-4">
                     @if (Model.Villa.IsAvailable)
                     {
-                        <button type="submit" class="btn btn-success form-control mt-3">Looks Good! Checkout Now</button>
+                        <button type="submit" class="btn btn-success form-control mt-3">Checkout <i class="bi bi-hand-thumbs-up"></i></button>
                     }
                     else
                     {
