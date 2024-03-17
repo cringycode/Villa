@@ -12,7 +12,7 @@ public class UnitOfWork : IUnitOfWork
     public IBookingRepo Booking { get; private set; }
     public IAppUserRepo AppUser { get; private set; }
 
-    public UnitOfWork(AppDbContext db, IAppUserRepo appUser)
+    public UnitOfWork(AppDbContext db)
     {
         _db = db;
         Villa = new VillaRepo(_db);
