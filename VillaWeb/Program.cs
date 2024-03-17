@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Villa.Application.Common.Interfaces;
+using Villa.Application.Services.Implementation;
+using Villa.Application.Services.Interface;
 using Villa.Domain.Entities;
 using Villa.Infrastructure.Data;
 using Villa.Infrastructure.Repos;
@@ -19,6 +21,7 @@ builder.Services.Configure<IdentityOptions>(option =>
     option.Password.RequireNonAlphanumeric = false;
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAppUserRepo, AppUserRepo>();
 var app = builder.Build();
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();

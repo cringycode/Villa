@@ -1,4 +1,5 @@
-﻿using Villa.Domain.Entities;
+﻿using Villa.Application.Common.DTO;
+using Villa.Domain.Entities;
 
 namespace Villa.Application.Common.Utility;
 
@@ -12,6 +13,8 @@ public class SD
     public const string StatusCompleted = "Completed";
     public const string StatusCancelled = "Cancelled";
     public const string StatusRefunded = "Refunded";
+
+    #region AVAILABLE ROOMS COUNT 
 
     public static int VillaRoomsAvailable_Count(int villaId,
         List<VillaNumber> villaNumberList, DateOnly checkInDate, int nights,
@@ -37,9 +40,37 @@ public class SD
         return finalAvailableRoomForAllNights;
     }
 
+    #endregion
+
     private static List<int> GetOverlappingBookingsForNight(List<Booking> bookings, DateOnly checkInDate, int villaId)
     {
         return bookings.Where(u => u.CheckInDate <= checkInDate && u.CheckOutDate > checkInDate
                                                                 && u.VillaId == villaId).Select(b => b.Id).ToList();
     }
+    
+    #region RADIAL CHART
+
+    public static RadialBarChartDto GetRadialChartDataModel(int totalCount, double currentMonthCount,
+        double prevMonthCount)
+    {
+        RadialBarChartDto radialBarChartDto = new();
+
+        int increaseDecreaseRatio = 100;
+
+        if (prevMonthCount != 0)
+        {
+            increaseDecreaseRatio =
+                Convert.ToInt32((currentMonthCount - prevMonthCount) / prevMonthCount * 100);
+        }
+
+        radialBarChartDto.TotalCount = totalCount;
+        radialBarChartDto.CountInCurrentMonth = Convert.ToUInt32(currentMonthCount);
+        radialBarChartDto.HasRatioIncreased = currentMonthCount > prevMonthCount;
+        radialBarChartDto.Series = new int[] { increaseDecreaseRatio };
+
+        return radialBarChartDto;
+    }
+
+    #endregion
+
 }
