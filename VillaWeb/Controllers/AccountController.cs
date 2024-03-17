@@ -108,11 +108,6 @@ public class AccountController : Controller
     public IActionResult Register(string returnUrl = null)
     {
         returnUrl ??= Url.Content("~/");
-        if (!_roleManager.RoleExistsAsync(SD.RoleAdmin).GetAwaiter().GetResult())
-        {
-            _roleManager.CreateAsync(new IdentityRole(SD.RoleAdmin)).Wait();
-            _roleManager.CreateAsync(new IdentityRole(SD.RoleCustomer)).Wait();
-        }
 
         RegisterVM registerVM = new()
         {

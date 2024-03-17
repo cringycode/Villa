@@ -22,6 +22,7 @@ builder.Services.Configure<IdentityOptions>(option =>
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IDbinitializer, Dbinitializer>();
 builder.Services.AddScoped<IAppUserRepo, AppUserRepo>();
 var app = builder.Build();
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
@@ -40,8 +41,19 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+SeedDatabase();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var Dbinitializer = scope.ServiceProvider.GetRequiredService<IDbinitializer>();
+        Dbinitializer.Initialize();
+    }
+}
