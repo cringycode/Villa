@@ -9,13 +9,15 @@ namespace VillaWeb.Controllers
 {
     public class HomeController : Controller
     {
-        #region DE
+        #region DI
 
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IVillaService _villaService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public HomeController(IUnitOfWork unitOfWork)
+        public HomeController(IVillaService villaService, IWebHostEnvironment webHostEnvironment)
         {
-            _unitOfWork = unitOfWork;
+            _villaService = villaService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         #endregion
@@ -26,7 +28,7 @@ namespace VillaWeb.Controllers
         {
             HomeVM homeVM = new()
             {
-                VillaList = _unitOfWork.Villa.GetAll(includeProperties: "VillaAmenity"),
+                VillaList = _villaService.GetAllVillas(),
                 Nights = 1,
                 CheckInDate = DateOnly.FromDateTime(DateTime.Now),
             };
@@ -38,24 +40,10 @@ namespace VillaWeb.Controllers
         [HttpPost]
         public IActionResult GetVillasByDate(int nights, DateOnly checkInDate)
         {
-            var villaList = _unitOfWork.Villa.GetAll(includeProperties: "VillaAmenity").ToList();
-            var villaNumberList = _unitOfWork.VillaNumber.GetAll().ToList();
-            var bookedVillas = _unitOfWork.Booking.GetAll
-                    (u => u.Status == SD.StatusApproved || u.Status == SD.StatusCheckedIn)
-                .ToList();
-
-            foreach (var villa in villaList)
-            {
-                int roomAvailable = SD.VillaRoomsAvailable_Count
-                    (villa.Id, villaNumberList, checkInDate, nights, bookedVillas);
-
-                villa.IsAvailable = roomAvailable > 0 ? true : false;
-            }
-
             HomeVM homeVM = new()
             {
                 CheckInDate = checkInDate,
-                VillaList = villaList,
+                VillaList = _villaService.GetAvailabilityByDate(nights, checkInDate),
                 Nights = nights
             };
 
